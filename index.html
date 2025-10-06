@@ -1,1 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="./assets/images/icon.png" type="image/png" />
+    <title>Art Class</title>
+    <link rel="stylesheet" href="./css/master.css" />
+  </head>
+  <body theme="main">
+    <nav>
+      <div class="logo">
+        <img src="./assets/images/icon.png" alt="Logo" draggable="false" />
+        <h1>Art Class</h1>
+      </div>
+      <div class="navitems">
+        <div class="navitem"><a selected href="/">Home</a></div>
+        <div class="navitem"><a href="#" onclick="loadcustomgame()">Add Game</a></div>
+        <div class="navitem"><a href="#" onclick="loadcustomapp()">Add App</a></div>
+      </div>
+    </nav>
 
+    <div class="center-container">
+      <h1>Welcome to <span>Art Class</span></h1>
+      <br />
+      <button onclick="launchab()" id="launchab" class="button play">Launch in about:blank</button>
+      <div style="margin-top:14px">
+        <label>
+          <input id="launch-blank" type="checkbox" /> Auto-launch in about:blank when embedded
+        </label>
+      </div>
+    </div>
+
+    <footer>
+      <div style="max-width:860px;margin:0 auto">
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
+          <a href="https://github.com/art-class/v4" target="_blank" rel="noreferrer noopener">GitHub</a>
+          <a href="https://discord.gg/tMaHQ2dyk5" target="_blank" rel="noreferrer noopener">Discord</a>
+          <a href="#" onclick="clearlocal()">Reset Settings</a>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <label>Panic key <input id="panic-key" placeholder="e.g. ` or Escape" /></label>
+          <label>Panic URL <input id="panic-url" placeholder="https://classroom.google.com/h" /></label>
+        </div>
+        <small class="muted">Press your panic key to immediately redirect this page.</small>
+      </div>
+    </footer>
+
+    <script>
+      function clearlocal(){ localStorage.clear(); location.reload(); }
+    </script>
+    <script src="./js/index.js"></script>
+  </body>
+</html>
