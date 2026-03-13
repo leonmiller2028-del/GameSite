@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Neon Void — Space Survival</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+</head>
+<body>
+  <div id="ui-layer">
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen active">
+      <h1 class="title">NEON<span class="accent">VOID</span></h1>
+      <p class="subtitle">SPACE SURVIVAL</p>
+      <div class="controls-info">
+        <p><strong>WASD</strong> or <strong>Arrow Keys</strong> to move</p>
+        <p><strong>Mouse</strong> to aim &amp; <strong>Click</strong> to shoot</p>
+        <p>or <strong>Spacebar</strong> to auto-fire</p>
+        <p class="mobile-hint">On mobile: use the <strong>joystick</strong> to move, <strong>tap</strong> to shoot</p>
+      </div>
+      <button id="start-btn" class="neon-btn">START GAME</button>
+      <p class="highscore-display" id="start-highscore"></p>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+      <div class="hud-left">
+        <div class="hud-score">SCORE <span id="hud-score-val">0</span></div>
+        <div class="hud-wave">WAVE <span id="hud-wave-val">1</span></div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-lives" id="hud-lives"></div>
+        <div class="hud-powerup" id="hud-powerup"></div>
+      </div>
+    </div>
+
+    <!-- Wave Announcement -->
+    <div id="wave-announce" class="hidden">
+      <span class="wave-text">WAVE <span id="wave-announce-num">1</span></span>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="screen">
+      <h1 class="title gameover-title">GAME<span class="accent">OVER</span></h1>
+      <p class="final-score">Score: <span id="final-score">0</span></p>
+      <p class="final-wave">Wave: <span id="final-wave">1</span></p>
+      <p class="highscore-display" id="gameover-highscore"></p>
+      <button id="restart-btn" class="neon-btn">PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <canvas id="game-canvas"></canvas>
+
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #000;
+  overflow: hidden;
+  font-family: 'Orbitron', sans-serif;
+  color: #fff;
+  cursor: crosshair;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#game-canvas {
+  display: block;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 1;
+}
+
+#ui-layer {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Screens */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  pointer-events: none;
+}
+.screen.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.title {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-shadow:
+    0 0 10px rgba(0, 200, 255, 0.8),
+    0 0 40px rgba(0, 200, 255, 0.4),
+    0 0 80px rgba(0, 200, 255, 0.2);
+  margin-bottom: 0.2em;
+}
+.accent {
+  color: #0ff;
+}
+
+.subtitle {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(0.8rem, 2.5vw, 1.2rem);
+  letter-spacing: 0.6em;
+  color: rgba(0, 255, 255, 0.5);
+  margin-bottom: 2em;
+}
+
+.controls-info {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(0.65rem, 1.8vw, 0.85rem);
+  text-align: center;
+  line-height: 2;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2em;
+}
+.controls-info strong {
+  color: #0ff;
+}
+.mobile-hint {
+  display: none;
+}
+@media (pointer: coarse) {
+  .mobile-hint { display: block; }
+}
+
+.neon-btn {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  padding: 0.8em 2.5em;
+  color: #0ff;
+  background: transparent;
+  border: 2px solid #0ff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.3),
+    inset 0 0 10px rgba(0, 255, 255, 0.1);
+}
+.neon-btn:hover, .neon-btn:focus {
+  background: rgba(0, 255, 255, 0.15);
+  box-shadow:
+    0 0 20px rgba(0, 255, 255, 0.5),
+    inset 0 0 20px rgba(0, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.highscore-display {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
+  color: rgba(255, 200, 0, 0.7);
+  margin-top: 1.5em;
+}
+
+.gameover-title {
+  color: #f44;
+  text-shadow:
+    0 0 10px rgba(255, 50, 50, 0.8),
+    0 0 40px rgba(255, 50, 50, 0.4);
+}
+.gameover-title .accent {
+  color: #f66;
+}
+
+.final-score, .final-wave {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.3em;
+}
+.final-score span { color: #0ff; }
+.final-wave span { color: #0ff; }
+
+/* HUD */
+#hud {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  font-family: 'Share Tech Mono', monospace;
+  pointer-events: none;
+}
+#hud.hidden { display: none; }
+
+.hud-left, .hud-right { display: flex; flex-direction: column; gap: 0.3rem; }
+.hud-right { align-items: flex-end; }
+
+.hud-score {
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  color: rgba(255, 255, 255, 0.6);
+}
+.hud-score span { color: #0ff; font-weight: 700; }
+
+.hud-wave {
+  font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+  color: rgba(255, 255, 255, 0.4);
+}
+.hud-wave span { color: #0ff; }
+
+.hud-lives { display: flex; gap: 0.4rem; }
+
+.hud-powerup {
+  font-size: 0.75rem;
+  color: #ff0;
+  text-shadow: 0 0 6px rgba(255, 255, 0, 0.6);
+  min-height: 1em;
+}
+
+/* Wave Announcement */
+#wave-announce {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+#wave-announce.hidden { display: none; }
+
+.wave-text {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: #0ff;
+  text-shadow:
+    0 0 20px rgba(0, 255, 255, 0.8),
+    0 0 60px rgba(0, 255, 255, 0.3);
+  animation: waveIn 2s ease-out forwards;
+}
+
+@keyframes waveIn {
+  0% { opacity: 0; transform: scale(2); }
+  20% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
