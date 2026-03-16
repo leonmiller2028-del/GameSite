@@ -3,55 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Neon Void — Space Survival</title>
+  <title>DataCenter Tycoon</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>">
 </head>
 <body>
-  <div id="ui-layer">
-    <!-- Start Screen -->
-    <div id="start-screen" class="screen active">
-      <h1 class="title">NEON<span class="accent">VOID</span></h1>
-      <p class="subtitle">SPACE SURVIVAL</p>
-      <div class="controls-info">
-        <p><strong>WASD</strong> or <strong>Arrow Keys</strong> to move</p>
-        <p><strong>Mouse</strong> to aim &amp; <strong>Click</strong> to shoot</p>
-        <p>or <strong>Spacebar</strong> to auto-fire</p>
-        <p class="mobile-hint">On mobile: use the <strong>joystick</strong> to move, <strong>tap</strong> to shoot</p>
+  <div id="app">
+
+    <!-- Top Bar -->
+    <header id="topbar">
+      <div class="tb-left">
+        <span class="logo">◆ DATACENTER TYCOON</span>
       </div>
-      <button id="start-btn" class="neon-btn">START GAME</button>
-      <p class="highscore-display" id="start-highscore"></p>
+      <div class="tb-center">
+        <div class="stat"><span class="stat-label">FUNDS</span><span class="stat-value" id="money-val">$5,000</span></div>
+        <div class="stat"><span class="stat-label">DAY</span><span class="stat-value" id="day-val">1</span></div>
+        <div class="stat"><span class="stat-label">INCOME</span><span class="stat-value income" id="income-val">+$0/d</span></div>
+        <div class="stat"><span class="stat-label">REPUTATION</span><span class="stat-value" id="rep-val">0</span></div>
+      </div>
+      <div class="tb-right">
+        <button class="tb-btn" id="speed-btn" title="Game Speed">⏸ Paused</button>
+        <button class="tb-btn" id="help-btn" title="Tutorial">?</button>
+      </div>
+    </header>
+
+    <!-- Main Area -->
+    <main id="main">
+
+      <!-- Shop Panel -->
+      <aside id="shop">
+        <h3 class="panel-title">EQUIPMENT</h3>
+        <div id="shop-list"></div>
+        <div id="shop-footer">
+          <button id="sell-mode-btn" class="shop-action-btn">🗑 SELL MODE</button>
+          <button id="expand-btn" class="shop-action-btn expand">⊞ EXPAND — $3,000</button>
+        </div>
+      </aside>
+
+      <!-- Canvas Grid -->
+      <section id="grid-wrap">
+        <canvas id="canvas"></canvas>
+      </section>
+
+      <!-- Info Panel -->
+      <aside id="info">
+        <div class="tab-bar">
+          <button class="tab active" data-tab="clients">CLIENTS</button>
+          <button class="tab" data-tab="alerts">ALERTS</button>
+        </div>
+        <div id="clients-tab" class="tab-content active">
+          <h4 class="section-head">Available Contracts</h4>
+          <div id="client-offers"></div>
+          <h4 class="section-head">Active Clients <span id="active-count">(0)</span></h4>
+          <div id="client-active"></div>
+        </div>
+        <div id="alerts-tab" class="tab-content">
+          <div id="alerts-list"></div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Resource Bar -->
+    <footer id="resbar">
+      <div class="res"><span class="res-icon">⚡</span><span class="res-label">POWER</span><div class="res-bar"><div class="res-fill" id="power-fill"></div></div><span class="res-text" id="power-text">0/0W</span></div>
+      <div class="res"><span class="res-icon">❄</span><span class="res-label">COOLING</span><div class="res-bar"><div class="res-fill" id="cool-fill"></div></div><span class="res-text" id="cool-text">0/0</span></div>
+      <div class="res"><span class="res-icon">◼</span><span class="res-label">CPU</span><div class="res-bar"><div class="res-fill" id="cpu-fill"></div></div><span class="res-text" id="cpu-text">0/0</span></div>
+      <div class="res"><span class="res-icon">▪</span><span class="res-label">RAM</span><div class="res-bar"><div class="res-fill" id="ram-fill"></div></div><span class="res-text" id="ram-text">0/0 GB</span></div>
+      <div class="res"><span class="res-icon">◎</span><span class="res-label">DISK</span><div class="res-bar"><div class="res-fill" id="disk-fill"></div></div><span class="res-text" id="disk-text">0/0 GB</span></div>
+      <div class="res"><span class="res-icon">⇄</span><span class="res-label">NET</span><div class="res-bar"><div class="res-fill" id="bw-fill"></div></div><span class="res-text" id="bw-text">0/0 Mb</span></div>
+    </footer>
+
+    <!-- Welcome Overlay -->
+    <div id="welcome-overlay" class="overlay active">
+      <div class="overlay-box welcome-box">
+        <h1 class="welcome-title">◆ DATACENTER<br><span>TYCOON</span></h1>
+        <p class="welcome-sub">Build. Scale. Dominate.</p>
+        <p class="welcome-desc">Start with an empty server room and $5,000.<br>Buy equipment, accept clients, and build a hosting empire.</p>
+        <button id="new-game-btn" class="primary-btn">NEW GAME</button>
+        <button id="continue-btn" class="secondary-btn">CONTINUE</button>
+      </div>
     </div>
 
-    <!-- HUD -->
-    <div id="hud" class="hidden">
-      <div class="hud-left">
-        <div class="hud-score">SCORE <span id="hud-score-val">0</span></div>
-        <div class="hud-wave">WAVE <span id="hud-wave-val">1</span></div>
-      </div>
-      <div class="hud-right">
-        <div class="hud-lives" id="hud-lives"></div>
-        <div class="hud-powerup" id="hud-powerup"></div>
+    <!-- Tutorial Overlay -->
+    <div id="tutorial-overlay" class="overlay">
+      <div class="overlay-box tutorial-box">
+        <h3 id="tut-title">Welcome!</h3>
+        <p id="tut-text"></p>
+        <div class="tut-btns">
+          <button id="tut-skip" class="secondary-btn">Skip</button>
+          <button id="tut-next" class="primary-btn">Next →</button>
+        </div>
       </div>
     </div>
 
-    <!-- Wave Announcement -->
-    <div id="wave-announce" class="hidden">
-      <span class="wave-text">WAVE <span id="wave-announce-num">1</span></span>
-    </div>
+    <!-- Notifications -->
+    <div id="notif-container"></div>
 
-    <!-- Game Over Screen -->
-    <div id="gameover-screen" class="screen">
-      <h1 class="title gameover-title">GAME<span class="accent">OVER</span></h1>
-      <p class="final-score">Score: <span id="final-score">0</span></p>
-      <p class="final-wave">Wave: <span id="final-wave">1</span></p>
-      <p class="highscore-display" id="gameover-highscore"></p>
-      <button id="restart-btn" class="neon-btn">PLAY AGAIN</button>
-    </div>
   </div>
-
-  <canvas id="game-canvas"></canvas>
-
   <script src="game.js"></script>
 </body>
 </html>
