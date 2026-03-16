@@ -269,7 +269,11 @@ function getTargetBlock(){
 //  PHYSICS
 // ═══════════════════════════════════════════
 const keys = {};
-window.addEventListener("keydown",e=>{ keys[e.code]=true; if(e.code==="KeyE"){e.preventDefault();toggleShop();} });
+window.addEventListener("keydown",e=>{
+  keys[e.code]=true;
+  if(e.code==="KeyE"&&(locked||shopOpen)){e.preventDefault();toggleShop();}
+  if(e.code==="Escape"&&shopOpen){shopOpen=false;document.getElementById("shop-overlay").classList.add("hidden");}
+});
 window.addEventListener("keyup",e=>{ keys[e.code]=false; });
 
 function collides(x,y,z){
@@ -330,26 +334,30 @@ function movePlayer(dt){
 //  MINING
 // ═══════════════════════════════════════════
 let mouseDown = false;
-renderer.domElement.addEventListener("mousedown",e=>{ if(e.button===0)mouseDown=true; });
-renderer.domElement.addEventListener("mouseup",e=>{ if(e.button===0){mouseDown=false;mining.active=false;} });
+document.addEventListener("mousedown",e=>{ if(e.button===0 && locked && !shopOpen) mouseDown=true; });
+document.addEventListener("mouseup",e=>{ if(e.button===0){mouseDown=false;mining.active=false;} });
 
-function updateMining(dt){
-  const bar=document.getElementById("mining-bar");
-  const fill=document.getElementById("mining-fill");
-  if(shopOpen||!locked||!mouseDown){
-    mining.active=false; bar.classList.add("hidden"); return;
-  }
+function updateHighlight(){
+  if(!locked||shopOpen){hlMesh.visible=false;return null;}
   const t=getTargetBlock();
-  if(!t){mining.active=false;bar.classList.add("hidden");hlMesh.visible=false;return;}
-
+  if(!t){hlMesh.visible=false;return null;}
   hlMesh.position.set(t.x+0.5,t.y+0.5,t.z+0.5);
   hlMesh.visible=true;
+  return t;
+}
 
-  const bt=getBlock(t.x,t.y,t.z);
+function updateMining(dt,target){
+  const bar=document.getElementById("mining-bar");
+  const fill=document.getElementById("mining-fill");
+  if(!target||!mouseDown){
+    mining.active=false; bar.classList.add("hidden"); return;
+  }
+
+  const bt=getBlock(target.x,target.y,target.z);
   if(bt===B.AIR||bt===B.BEDROCK){mining.active=false;bar.classList.add("hidden");return;}
 
-  if(!mining.active||mining.bx!==t.x||mining.by!==t.y||mining.bz!==t.z){
-    mining={active:true,bx:t.x,by:t.y,bz:t.z,progress:0};
+  if(!mining.active||mining.bx!==target.x||mining.by!==target.y||mining.bz!==target.z){
+    mining={active:true,bx:target.x,by:target.y,bz:target.z,progress:0};
   }
 
   const tool=TOOLS[player.tool];
@@ -362,7 +370,7 @@ function updateMining(dt){
   fill.style.width=(pct*100)+"%";
 
   if(pct>=1){
-    mineBlock(t.x,t.y,t.z,bt);
+    mineBlock(target.x,target.y,target.z,bt);
     mining.active=false;
     bar.classList.add("hidden");
   }
@@ -456,7 +464,12 @@ function updateHotbar(){
 function toggleShop(){
   shopOpen=!shopOpen;
   document.getElementById("shop-overlay").classList.toggle("hidden",!shopOpen);
-  if(shopOpen) renderShop();
+  if(shopOpen){
+    document.exitPointerLock();
+    renderShop();
+  } else {
+    controls.lock();
+  }
 }
 
 function renderShop(){
@@ -537,7 +550,10 @@ function loop(ts){
 
   if(locked&&!shopOpen){
     movePlayer(dt);
-    updateMining(dt);
+    const target=updateHighlight();
+    updateMining(dt,target);
+  } else {
+    hlMesh.visible=false;
   }
   updateParticles(dt);
   rebuildDirty();
