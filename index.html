@@ -2,74 +2,149 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Mine Deep — 3D Mining Simulator</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛏️</text></svg>">
-  <script type="importmap">
-  { "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
-  }}
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Radar</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div id="game">
-    <div id="crosshair">+</div>
+  <div id="app">
+    <div id="map"></div>
 
-    <div id="hud">
-      <div id="hud-money">$0</div>
-      <div id="hud-depth">Surface</div>
-      <div id="hud-tool">⛏ Wood Pickaxe</div>
-    </div>
+    <header id="top-bar">
+      <div class="logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <span>Weather Radar</span>
+      </div>
+      <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input type="text" id="search-input" placeholder="Search city or location..." autocomplete="off" />
+        <div id="search-results" class="search-results hidden"></div>
+      </div>
+      <button id="locate-btn" title="My Location">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+        </svg>
+      </button>
+    </header>
 
-    <div id="hotbar"></div>
+    <aside id="sidebar">
+      <div class="sidebar-section">
+        <h3>Radar Layers</h3>
+        <label class="layer-toggle active" data-layer="radar">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="layer-label">Precipitation</span>
+        </label>
+        <label class="layer-toggle" data-layer="clouds">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="layer-label">Cloud Cover</span>
+        </label>
+        <label class="layer-toggle" data-layer="temp">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="layer-label">Temperature</span>
+        </label>
+        <label class="layer-toggle" data-layer="wind">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="layer-label">Wind Speed</span>
+        </label>
+        <label class="layer-toggle" data-layer="pressure">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="layer-label">Pressure</span>
+        </label>
+      </div>
 
-    <div id="mining-bar" class="hidden">
-      <div id="mining-fill"></div>
-    </div>
-
-    <div id="shop-overlay" class="hidden">
-      <div class="shop-panel">
-        <h2>⛏ MINING SHOP</h2>
-        <div class="shop-cols">
-          <div class="shop-section">
-            <h3>SELL ORES</h3>
-            <div id="sell-list"></div>
-            <button id="sell-all-btn" class="shop-btn sell">SELL ALL ORES</button>
-          </div>
-          <div class="shop-section">
-            <h3>PICKAXES</h3>
-            <div id="tool-list"></div>
-          </div>
-          <div class="shop-section">
-            <h3>UPGRADES</h3>
-            <div id="upgrade-list"></div>
-          </div>
+      <div class="sidebar-section">
+        <h3>Radar Opacity</h3>
+        <div class="slider-container">
+          <input type="range" id="opacity-slider" min="0" max="100" value="70" />
+          <span id="opacity-value">70%</span>
         </div>
-        <p class="shop-hint">Press <strong>E</strong> to close</p>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>Map Style</h3>
+        <div class="map-style-grid">
+          <button class="map-style-btn active" data-style="dark">Dark</button>
+          <button class="map-style-btn" data-style="light">Light</button>
+          <button class="map-style-btn" data-style="satellite">Satellite</button>
+          <button class="map-style-btn" data-style="terrain">Terrain</button>
+        </div>
+      </div>
+    </aside>
+
+    <button id="sidebar-toggle" title="Toggle sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+      </svg>
+    </button>
+
+    <div id="timeline-bar">
+      <button id="play-btn" title="Play animation">
+        <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="5,3 19,12 5,21"/>
+        </svg>
+        <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" class="hidden">
+          <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+        </svg>
+      </button>
+      <div id="timeline-track">
+        <div id="timeline-progress"></div>
+        <div id="timeline-frames"></div>
+      </div>
+      <span id="timeline-label">Loading...</span>
+    </div>
+
+    <div id="weather-info" class="hidden">
+      <button id="weather-info-close">&times;</button>
+      <h3 id="info-location">--</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-value" id="info-temp">--</span>
+          <span class="info-label">Temperature</span>
+        </div>
+        <div class="info-item">
+          <span class="info-value" id="info-feels">--</span>
+          <span class="info-label">Feels Like</span>
+        </div>
+        <div class="info-item">
+          <span class="info-value" id="info-humidity">--</span>
+          <span class="info-label">Humidity</span>
+        </div>
+        <div class="info-item">
+          <span class="info-value" id="info-wind">--</span>
+          <span class="info-label">Wind</span>
+        </div>
+        <div class="info-item">
+          <span class="info-value" id="info-pressure">--</span>
+          <span class="info-label">Pressure</span>
+        </div>
+        <div class="info-item">
+          <span class="info-value" id="info-desc">--</span>
+          <span class="info-label">Condition</span>
+        </div>
       </div>
     </div>
 
-    <div id="start-overlay" class="overlay active">
-      <div class="start-box">
-        <h1>⛏ MINE DEEP</h1>
-        <p class="tagline">3D Mining Simulator</p>
-        <div class="help-grid">
-          <span>WASD</span><span>Move</span>
-          <span>Mouse</span><span>Look</span>
-          <span>Left Click</span><span>Mine blocks</span>
-          <span>Space</span><span>Jump</span>
-          <span>Shift</span><span>Sprint</span>
-          <span>E</span><span>Open shop</span>
-        </div>
-        <button id="play-btn" class="play-btn">CLICK TO PLAY</button>
+    <div id="legend">
+      <div class="legend-title">Precipitation (dBZ)</div>
+      <div class="legend-bar"></div>
+      <div class="legend-labels">
+        <span>Light</span>
+        <span>Moderate</span>
+        <span>Heavy</span>
+        <span>Extreme</span>
       </div>
     </div>
-
-    <div id="notif-area"></div>
-    <div id="discovery" class="hidden"><div id="disc-text"></div></div>
   </div>
-  <script type="module" src="game.js"></script>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
