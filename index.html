@@ -3,111 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>DataCenter Tycoon</title>
+  <title>Mine Deep — 3D Mining Simulator</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛏️</text></svg>">
+  <script type="importmap">
+  { "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+  }}
+  </script>
 </head>
 <body>
-  <div id="app">
+  <div id="game">
+    <div id="crosshair">+</div>
 
-    <header id="topbar">
-      <div class="tb-left"><span class="logo">◆ DATACENTER TYCOON</span></div>
-      <div class="tb-center">
-        <div class="stat"><span class="stat-label">FUNDS</span><span class="stat-value" id="money-val">$5,000</span></div>
-        <div class="stat"><span class="stat-label">DAY</span><span class="stat-value" id="day-val">1</span></div>
-        <div class="stat"><span class="stat-label">INCOME</span><span class="stat-value income" id="income-val">+$0/d</span></div>
-        <div class="stat"><span class="stat-label">REP</span><span class="stat-value" id="rep-val">0</span></div>
-      </div>
-      <div class="tb-right">
-        <button class="tb-btn" id="speed-btn">⏸ Paused</button>
-        <button class="tb-btn" id="help-btn">?</button>
-      </div>
-    </header>
+    <div id="hud">
+      <div id="hud-money">$0</div>
+      <div id="hud-depth">Surface</div>
+      <div id="hud-tool">⛏ Wood Pickaxe</div>
+    </div>
 
-    <main id="main">
+    <div id="hotbar"></div>
 
-      <!-- Shop Panel -->
-      <aside id="shop">
-        <h3 class="panel-title">EQUIPMENT</h3>
-        <div id="shop-list"></div>
-        <h3 class="panel-title" style="padding-top:6px">CABLES</h3>
-        <div id="cable-list"></div>
-        <div id="shop-footer">
-          <button id="sell-mode-btn" class="shop-action-btn">🗑 SELL MODE</button>
-          <button id="expand-btn" class="shop-action-btn expand">⊞ EXPAND — $3,000</button>
+    <div id="mining-bar" class="hidden">
+      <div id="mining-fill"></div>
+    </div>
+
+    <div id="shop-overlay" class="hidden">
+      <div class="shop-panel">
+        <h2>⛏ MINING SHOP</h2>
+        <div class="shop-cols">
+          <div class="shop-section">
+            <h3>SELL ORES</h3>
+            <div id="sell-list"></div>
+            <button id="sell-all-btn" class="shop-btn sell">SELL ALL ORES</button>
+          </div>
+          <div class="shop-section">
+            <h3>PICKAXES</h3>
+            <div id="tool-list"></div>
+          </div>
+          <div class="shop-section">
+            <h3>UPGRADES</h3>
+            <div id="upgrade-list"></div>
+          </div>
         </div>
-      </aside>
-
-      <!-- Grid -->
-      <section id="grid-wrap">
-        <div id="mode-bar">Place equipment and connect with cables</div>
-        <canvas id="canvas"></canvas>
-      </section>
-
-      <!-- Info Panel -->
-      <aside id="info">
-        <div class="tab-bar">
-          <button class="tab active" data-tab="clients">CLIENTS</button>
-          <button class="tab" data-tab="equip">INSPECT</button>
-          <button class="tab" data-tab="alerts">ALERTS</button>
-        </div>
-
-        <!-- Clients Tab -->
-        <div id="clients-tab" class="tab-content active">
-          <h4 class="section-head">Available Contracts</h4>
-          <div id="client-offers"></div>
-          <h4 class="section-head">Active Clients <span id="active-count">(0)</span></h4>
-          <div id="client-active"></div>
-        </div>
-
-        <!-- Equipment Inspect Tab -->
-        <div id="equip-tab" class="tab-content">
-          <div id="equip-placeholder" class="placeholder-text">Click on placed equipment to inspect it</div>
-          <div id="equip-info" class="hidden"></div>
-        </div>
-
-        <!-- Alerts Tab -->
-        <div id="alerts-tab" class="tab-content">
-          <div id="alerts-list"></div>
-        </div>
-      </aside>
-    </main>
-
-    <!-- Resource Bar -->
-    <footer id="resbar">
-      <div class="res"><span class="res-icon">⚡</span><span class="res-label">POWER</span><div class="res-bar"><div class="res-fill" id="power-fill"></div></div><span class="res-text" id="power-text">0/0W</span></div>
-      <div class="res"><span class="res-icon">❄</span><span class="res-label">COOLING</span><div class="res-bar"><div class="res-fill" id="cool-fill"></div></div><span class="res-text" id="cool-text">0/0</span></div>
-      <div class="res"><span class="res-icon">◼</span><span class="res-label">CPU</span><div class="res-bar"><div class="res-fill" id="cpu-fill"></div></div><span class="res-text" id="cpu-text">0/0</span></div>
-      <div class="res"><span class="res-icon">▪</span><span class="res-label">RAM</span><div class="res-bar"><div class="res-fill" id="ram-fill"></div></div><span class="res-text" id="ram-text">0/0 GB</span></div>
-      <div class="res"><span class="res-icon">◎</span><span class="res-label">DISK</span><div class="res-bar"><div class="res-fill" id="disk-fill"></div></div><span class="res-text" id="disk-text">0/0 GB</span></div>
-      <div class="res"><span class="res-icon">⇄</span><span class="res-label">NET</span><div class="res-bar"><div class="res-fill" id="bw-fill"></div></div><span class="res-text" id="bw-text">0/0 Mb</span></div>
-    </footer>
-
-    <!-- Welcome Overlay -->
-    <div id="welcome-overlay" class="overlay active">
-      <div class="overlay-box welcome-box">
-        <h1 class="welcome-title">◆ DATACENTER<br><span>TYCOON</span></h1>
-        <p class="welcome-sub">Build. Connect. Dominate.</p>
-        <p class="welcome-desc">Equipment must be connected with cables to work.<br>Place servers, wire them up, accept clients, and build an empire.</p>
-        <button id="new-game-btn" class="primary-btn">NEW GAME</button>
-        <button id="continue-btn" class="secondary-btn">CONTINUE</button>
+        <p class="shop-hint">Press <strong>E</strong> to close</p>
       </div>
     </div>
 
-    <!-- Tutorial Overlay -->
-    <div id="tutorial-overlay" class="overlay">
-      <div class="overlay-box tutorial-box">
-        <h3 id="tut-title">Welcome!</h3>
-        <p id="tut-text"></p>
-        <div class="tut-btns">
-          <button id="tut-skip" class="secondary-btn">Skip</button>
-          <button id="tut-next" class="primary-btn">Next →</button>
+    <div id="start-overlay" class="overlay active">
+      <div class="start-box">
+        <h1>⛏ MINE DEEP</h1>
+        <p class="tagline">3D Mining Simulator</p>
+        <div class="help-grid">
+          <span>WASD</span><span>Move</span>
+          <span>Mouse</span><span>Look</span>
+          <span>Left Click</span><span>Mine blocks</span>
+          <span>Space</span><span>Jump</span>
+          <span>Shift</span><span>Sprint</span>
+          <span>E</span><span>Open shop</span>
         </div>
+        <button id="play-btn" class="play-btn">CLICK TO PLAY</button>
       </div>
     </div>
 
-    <div id="notif-container"></div>
+    <div id="notif-area"></div>
+    <div id="discovery" class="hidden"><div id="disc-text"></div></div>
   </div>
-  <script src="game.js"></script>
+  <script type="module" src="game.js"></script>
 </body>
 </html>
