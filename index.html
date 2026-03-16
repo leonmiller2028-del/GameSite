@@ -10,38 +10,37 @@
 <body>
   <div id="app">
 
-    <!-- Top Bar -->
     <header id="topbar">
-      <div class="tb-left">
-        <span class="logo">◆ DATACENTER TYCOON</span>
-      </div>
+      <div class="tb-left"><span class="logo">◆ DATACENTER TYCOON</span></div>
       <div class="tb-center">
         <div class="stat"><span class="stat-label">FUNDS</span><span class="stat-value" id="money-val">$5,000</span></div>
         <div class="stat"><span class="stat-label">DAY</span><span class="stat-value" id="day-val">1</span></div>
         <div class="stat"><span class="stat-label">INCOME</span><span class="stat-value income" id="income-val">+$0/d</span></div>
-        <div class="stat"><span class="stat-label">REPUTATION</span><span class="stat-value" id="rep-val">0</span></div>
+        <div class="stat"><span class="stat-label">REP</span><span class="stat-value" id="rep-val">0</span></div>
       </div>
       <div class="tb-right">
-        <button class="tb-btn" id="speed-btn" title="Game Speed">⏸ Paused</button>
-        <button class="tb-btn" id="help-btn" title="Tutorial">?</button>
+        <button class="tb-btn" id="speed-btn">⏸ Paused</button>
+        <button class="tb-btn" id="help-btn">?</button>
       </div>
     </header>
 
-    <!-- Main Area -->
     <main id="main">
 
       <!-- Shop Panel -->
       <aside id="shop">
         <h3 class="panel-title">EQUIPMENT</h3>
         <div id="shop-list"></div>
+        <h3 class="panel-title" style="padding-top:6px">CABLES</h3>
+        <div id="cable-list"></div>
         <div id="shop-footer">
           <button id="sell-mode-btn" class="shop-action-btn">🗑 SELL MODE</button>
           <button id="expand-btn" class="shop-action-btn expand">⊞ EXPAND — $3,000</button>
         </div>
       </aside>
 
-      <!-- Canvas Grid -->
+      <!-- Grid -->
       <section id="grid-wrap">
+        <div id="mode-bar">Place equipment and connect with cables</div>
         <canvas id="canvas"></canvas>
       </section>
 
@@ -49,14 +48,25 @@
       <aside id="info">
         <div class="tab-bar">
           <button class="tab active" data-tab="clients">CLIENTS</button>
+          <button class="tab" data-tab="equip">INSPECT</button>
           <button class="tab" data-tab="alerts">ALERTS</button>
         </div>
+
+        <!-- Clients Tab -->
         <div id="clients-tab" class="tab-content active">
           <h4 class="section-head">Available Contracts</h4>
           <div id="client-offers"></div>
           <h4 class="section-head">Active Clients <span id="active-count">(0)</span></h4>
           <div id="client-active"></div>
         </div>
+
+        <!-- Equipment Inspect Tab -->
+        <div id="equip-tab" class="tab-content">
+          <div id="equip-placeholder" class="placeholder-text">Click on placed equipment to inspect it</div>
+          <div id="equip-info" class="hidden"></div>
+        </div>
+
+        <!-- Alerts Tab -->
         <div id="alerts-tab" class="tab-content">
           <div id="alerts-list"></div>
         </div>
@@ -77,8 +87,8 @@
     <div id="welcome-overlay" class="overlay active">
       <div class="overlay-box welcome-box">
         <h1 class="welcome-title">◆ DATACENTER<br><span>TYCOON</span></h1>
-        <p class="welcome-sub">Build. Scale. Dominate.</p>
-        <p class="welcome-desc">Start with an empty server room and $5,000.<br>Buy equipment, accept clients, and build a hosting empire.</p>
+        <p class="welcome-sub">Build. Connect. Dominate.</p>
+        <p class="welcome-desc">Equipment must be connected with cables to work.<br>Place servers, wire them up, accept clients, and build an empire.</p>
         <button id="new-game-btn" class="primary-btn">NEW GAME</button>
         <button id="continue-btn" class="secondary-btn">CONTINUE</button>
       </div>
@@ -96,9 +106,7 @@
       </div>
     </div>
 
-    <!-- Notifications -->
     <div id="notif-container"></div>
-
   </div>
   <script src="game.js"></script>
 </body>
